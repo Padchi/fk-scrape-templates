@@ -1,4 +1,4 @@
-# Version 1.0.1
+# Version 1.0.2
 
 artists_doc = Nokogiri::HTML(open("http://peaceandlove.se/artister/"))
 
@@ -6,7 +6,7 @@ bookings = []
 
 artists_doc.xpath("//div[contains(@class, 'artist')]/article").each do |data|
   name = data.xpath(".//h2[@class='heading']").text.strip
-  spotify_id = data.xpath(".//div[@class='links']/a[starts-with(@href, 'https://open.spotify.com/artist/')]/@href").text.gsub("https://open.spotify.com/artist/", "") || nil
+  spotify_id = data.xpath(".//div[@class='links']/a[contains(@href, '://open.spotify.com/artist/')]/@href").text.split('/')[-1] || nil
   playing_on = nil
 
   booking = { name: name, spotify_id: spotify_id, playing_on: playing_on }
