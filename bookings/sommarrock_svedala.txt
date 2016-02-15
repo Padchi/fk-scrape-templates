@@ -1,0 +1,16 @@
+# Version 1.0.0
+
+artists_doc = Nokogiri::HTML(open("http://sommarrock.nu/bokadeartister.php"))
+
+bookings = []
+
+artists_doc.xpath("//div[@class='content']/table").each do |data|
+  name = data.xpath(".//h4").text.strip
+  spotify_id = data.xpath(".//a[contains(@href, '://open.spotify.com/artist/')]/@href").text.split('/')[-1] || nil
+  playing_on = nil
+
+  booking = { name: name, spotify_id: spotify_id, playing_on: playing_on }
+  bookings << booking
+end
+
+bookings
