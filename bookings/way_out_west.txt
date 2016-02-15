@@ -1,0 +1,14 @@
+# Version 1.0.0
+
+artists_doc = Nokogiri::HTML(open("http://www.wayoutwest.se/line-up/"))
+
+bookings = []
+
+artists_doc.xpath("//section[@id='item-listing']//ul[@class='items']/li/a").each do |data|
+  name = data.content.strip
+
+  booking = { name: name, spotify_id: nil, playing_on: nil }
+  bookings << booking
+end
+
+bookings
