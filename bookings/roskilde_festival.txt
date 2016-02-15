@@ -1,4 +1,4 @@
-# Version 1.0.0
+# Version 1.0.1
 
 doc = Nokogiri::XML(open("http://www.roskilde-festival.dk/artists-0-sitemap.xml"))
 
@@ -8,7 +8,7 @@ doc.xpath("//sitemap:loc[starts-with(text(), 'http://www.roskilde-festival.dk/mu
   details_doc = Nokogiri::HTML(open(data.to_s + "?_escaped_fragment_="))
 
   name = details_doc.xpath("//h1[@ng-bind='artist.displayName']").text.strip
-  spotify_id = details_doc.xpath("//iframe[@class='spotify']/@src").text.gsub("https://embed.spotify.com/?uri=spotify:artist:", "") || nil
+  spotify_id = details_doc.xpath("//iframe[@class='spotify']/@src").text.split(':')[-1] || nil
 
   booking = { name: name, playing_on: nil, spotify_id: spotify_id }
   bookings << booking
