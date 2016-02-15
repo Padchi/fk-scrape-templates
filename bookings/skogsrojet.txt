@@ -1,0 +1,16 @@
+# Version 1.0.0
+
+artists_doc = Nokogiri::HTML(open("http://www.skogsrojet.se/artister/"))
+
+bookings = []
+
+artists_doc.xpath("//ul[@id='menu-artister']/li/a").each do |data|
+  name = data.text.strip
+  spotify_id = nil
+  playing_on = nil
+
+  booking = { name: name, spotify_id: spotify_id, playing_on: playing_on }
+  bookings << booking
+end
+
+bookings
