@@ -1,0 +1,15 @@
+# Version 1.0.0
+
+artists_doc = Nokogiri::HTML(open("http://oyafestivalen.no/program/"))
+
+bookings = []
+
+artists_doc.xpath("//tr[@class='artist-item']").each do |data|
+  name = data.xpath(".//td[@class='col2']/a").children.first.text.strip
+  playing_on = data.xpath(".//td[@class='col4']/span[@class='day']").text.strip || nil
+
+  booking = { name: name, spotify_id: nil, playing_on: playing_on }
+  bookings << booking
+end
+
+bookings
