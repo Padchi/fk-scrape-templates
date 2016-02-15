@@ -1,4 +1,4 @@
-# Version 1.0.0
+# Version 1.0.1
 
 artists_doc = Nokogiri::HTML(open("http://www.swedenrock.com/festival/artister/artister-2016"))
 schedule_doc = Nokogiri::HTML(open("http://www.swedenrock.com/festival/artister/spelschema-2016"))
@@ -9,8 +9,8 @@ artists_doc.xpath("//div[@id='band_container']/div//a/@href").each do |data|
   doc = Nokogiri::HTML(open(data))
 
   name = doc.xpath("//h1/.").children.first.text.strip
-  spotify_id = doc.xpath('//a[starts-with(@href, "https://open.spotify.com/artist/")]/@href').text.gsub("https://open.spotify.com/artist/", "") || nil
-  
+  spotify_id = doc.xpath("//a[contains(@href, '://open.spotify.com/artist/')]/@href").text.split("/")[-1] || nil
+
   booking = { name: name, spotify_id: spotify_id, playing_on: nil }
   bookings << booking
 end
