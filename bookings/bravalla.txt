@@ -1,0 +1,30 @@
+# Version 1.0.0
+
+doc = Nokogiri::HTML(open("http://www.bravallafestival.se/program/"))
+
+bookings = []
+
+doc.xpath("//a[@class='artist']").each do |data|
+  name = data.xpath(".//h2").children.first.text.strip
+  playing_on = data.xpath(".//h2/span").text.strip || nil
+  spotify_id = nil
+  details_url = data.xpath("./@href").text.strip
+
+  unless exclude.include?(name.downcase)
+    details_doc = Nokogiri::HTML(open(details_url))
+
+    name = details_doc.xpath("//div[@class='description']/h1").children.first.text.strip || nil
+    playing_on = details_doc.xpath("//div[@class='description']/p[@class='gig-info']").children.first.text.strip || nil
+    spotify_id = details_doc.xpath('//a[starts-with(@href, "spotify:artist:")]/@href').text.gsub("spotify:artist:", "") || nil    
+  end
+
+  # artist_doc = Nokogiri::HTML(open(data))
+  # name = artist_doc.xpath("//div[@class='description']/h1").children.first.text.strip
+  # playing_on = artist_doc.xpath("//div[@class='description']/p[@class='gig-info']").children.first.text.strip || nil
+  # spotify_id = artist_doc.xpath('//a[starts-with(@href, "spotify:artist:")]/@href').text.gsub("spotify:artist:", "") || nil
+
+  booking = { name: name, playing_on: playing_on, spotify_id: spotify_id }
+  bookings << booking
+end
+
+bookings
