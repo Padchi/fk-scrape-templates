@@ -1,0 +1,16 @@
+# Version 1.0.0
+
+doc = Nokogiri::HTML(open("http://www.uport.se/artister/2016"))
+
+bookings = []
+
+doc.xpath("//a[contains(@href, 'artister/2016') and @class='non-line artister']").each do |data|
+  name = data.xpath(".//h4").text.strip
+  spotify_id = nil
+  playing_on = data.xpath(".//preceding-sibling::h3[1]").text.strip
+
+  booking = { name: name, spotify_id: spotify_id, playing_on: playing_on }
+  bookings << booking
+end
+
+bookings
