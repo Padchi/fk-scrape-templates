@@ -1,14 +1,21 @@
-# Version 1.0.1
+# Version 2.0.0
 
-doc = Nokogiri::XML(open("http://www.roskilde-festival.dk/artists-0-sitemap.xml"))
+json = ""
+open("http://www.roskilde-festival.dk/api/artists/" + Time.now.year.to_s) {|j| json = j.read }
 
 bookings = []
 
-doc.xpath("//sitemap:loc[starts-with(text(), 'http://www.roskilde-festival.dk/music/2016/')]/text()", "sitemap" => "http://www.sitemaps.org/schemas/sitemap/0.9").each do |data|
-  details_doc = Nokogiri::HTML(open(data.to_s + "?_escaped_fragment_="))
+JSON.parse(json).each do |data|
+  details = ""
+  open("http://www.roskilde-festival.dk/api/artist/" + Time.now.year.to_s + "/" + data["urlParam"])  {|j| details = j.read }
+  hash = JSON.parse(details)
 
-  name = details_doc.xpath("//h1[@ng-bind='artist.displayName']").text.strip
-  spotify_id = details_doc.xpath("//iframe[@class='spotify']/@src").text.split(':')[-1] || nil
+  name = hash["displayName"].strip
+  spotify_id = nil
+
+  if hash["spotify"] && hash["spotify"][0]
+    spotify_id = hash["spotify"][0].gsub("spotify:artist:", "")
+  end
 
   booking = { name: name, playing_on: nil, spotify_id: spotify_id }
   bookings << booking
