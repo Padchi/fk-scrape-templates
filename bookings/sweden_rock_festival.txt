@@ -1,23 +1,29 @@
-# Version 1.0.1
+# Version 1.1.0
 
-artists_doc = Nokogiri::HTML(open("http://www.swedenrock.com/festival/artister/artister-2016"))
-schedule_doc = Nokogiri::HTML(open("http://www.swedenrock.com/festival/artister/spelschema-2016"))
+artists_doc = Nokogiri::HTML(open("http://www.swedenrock.com/festival/artister/artister-" + Time.now.year.to_s))
+schedule_doc = Nokogiri::HTML(open("http://www.swedenrock.com/festival/artister/spelschema-" + Time.now.year.to_s))
 
 bookings = []
 
 artists_doc.xpath("//div[@id='band_container']/div//a/@href").each do |data|
   doc = Nokogiri::HTML(open(data))
 
-  name = doc.xpath("//h1/.").children.first.text.strip
+  name = doc.xpath("//h1/.").children.first.text.strip || nil
   spotify_id = doc.xpath("//a[contains(@href, '://open.spotify.com/artist/')]/@href").text.split("/")[-1] || nil
 
-  booking = { name: name, spotify_id: spotify_id, playing_on: nil }
-  bookings << booking
+  if !except.include?(name.downcase) && (only.empty? || only.include?(name.downcase))
+    booking = { name: name, spotify_id: spotify_id, playing_on: nil }
+    bookings << booking
+  end
 end
 
 schedule_doc.xpath("//span[@class='scheduleBand']/a").each do |data|
-  booking = bookings.find { |b| b[:name].downcase == data.child.text.strip.downcase }
-  booking[:playing_on] = data.xpath("//div[@class='scheduleDay'][1]").text.strip
+  name = data.child.text.strip.downcase
+
+  if !except.include?(name) && (only.empty? || only.include?(name))
+    booking = bookings.find { |b| b[:name].downcase == name }
+    booking[:playing_on] = data.xpath("//div[@class='scheduleDay'][1]").text.strip if booking
+  end
 end
 
 bookings
