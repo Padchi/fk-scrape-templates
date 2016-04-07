@@ -1,11 +1,11 @@
-# Version 1.1.0
+# Version 1.1.1
 
 doc = Nokogiri::HTML(open("http://www.bravallafestival.se/program/"))
 
 bookings = []
 
 doc.xpath("//a[@class='artist']").each do |data|
-  name = data.xpath(".//h2").children.first.text.strip
+  name = data.xpath(".//h2").children.first.text.strip || nil
   playing_on = data.xpath(".//h2/span").text.strip || nil
   spotify_id = nil
   details_url = data.xpath("./@href").text.strip
