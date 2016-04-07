@@ -1,4 +1,4 @@
-# Version 2.0.0
+# Version 2.1.0
 
 json = ""
 open("http://www.roskilde-festival.dk/api/artists/" + Time.now.year.to_s) {|j| json = j.read }
@@ -6,19 +6,21 @@ open("http://www.roskilde-festival.dk/api/artists/" + Time.now.year.to_s) {|j| j
 bookings = []
 
 JSON.parse(json).each do |data|
-  details = ""
-  open("http://www.roskilde-festival.dk/api/artist/" + Time.now.year.to_s + "/" + data["urlParam"])  {|j| details = j.read }
-  hash = JSON.parse(details)
+  if !except.include?(data["displayName"].downcase) && (only.empty? || only.include?(data["displayName"].downcase))
+    details = ""
+    open("http://www.roskilde-festival.dk/api/artist/" + Time.now.year.to_s + "/" + data["urlParam"])  {|j| details = j.read }
+    hash = JSON.parse(details)
 
-  name = hash["displayName"].strip
-  spotify_id = nil
+    name = hash["displayName"].strip
+    spotify_id = nil
 
-  if hash["spotify"] && hash["spotify"][0]
-    spotify_id = hash["spotify"][0].gsub("spotify:artist:", "")
+    if hash["spotify"] && hash["spotify"][0]
+      spotify_id = hash["spotify"][0].gsub("spotify:artist:", "")
+    end
+
+    booking = { name: name, playing_on: nil, spotify_id: spotify_id }
+    bookings << booking
   end
-
-  booking = { name: name, playing_on: nil, spotify_id: spotify_id }
-  bookings << booking
 end
 
 bookings
