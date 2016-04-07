@@ -1,22 +1,24 @@
-# Version 1.0.0
+# Version 1.1.0
 
 doc = Nokogiri::HTML(open("http://www.viciousrock.se/index.php?page=artister.php"))
 
 bookings = []
-playing_on = nil
 
 doc.xpath("//div[@class='w3-col m12 l9']/div[@class='w3-quarter']/a").each do |data|
   details_doc = Nokogiri::HTML(open("http://www.viciousrock.se/" + data.attribute('href')))
 
-  name = details_doc.xpath("//h6").text.strip
+  name = details_doc.xpath("//h6").text.strip || nil
   spotify_id = details_doc.xpath("//a[contains(@href, '://open.spotify.com/artist/')]/@href").text.split("/")[-1] || nil
+  playing_on = nil
 
   if !data.xpath("..//preceding-sibling::p[1]").blank?
     playing_on = data.xpath("..//preceding-sibling::p[1]").text.strip
   end
 
-  booking = { name: name, spotify_id: spotify_id, playing_on: playing_on }
-  bookings << booking
+  if !except.include?(name.downcase) && (only.empty? || only.include?(name.downcase))
+    booking = { name: name, spotify_id: spotify_id, playing_on: playing_on }
+    bookings << booking
+  end
 end
 
 bookings
