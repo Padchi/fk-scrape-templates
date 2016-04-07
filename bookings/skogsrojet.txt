@@ -1,16 +1,18 @@
-# Version 1.0.0
+# Version 1.1.0
 
 artists_doc = Nokogiri::HTML(open("http://www.skogsrojet.se/artister/"))
 
 bookings = []
 
 artists_doc.xpath("//ul[@id='menu-artister']/li/a").each do |data|
-  name = data.text.strip
+  name = data.text.strip || nil
   spotify_id = nil
   playing_on = nil
 
-  booking = { name: name, spotify_id: spotify_id, playing_on: playing_on }
-  bookings << booking
+  if !except.include?(name.downcase) && (only.empty? || only.include?(name.downcase))
+    booking = { name: name, spotify_id: spotify_id, playing_on: playing_on }
+    bookings << booking
+  end
 end
 
 bookings
