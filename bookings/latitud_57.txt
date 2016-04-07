@@ -1,4 +1,4 @@
-# Version 1.0.0
+# Version 1.1.0
 
 artists_doc = Nokogiri::HTML(open("http://www.latitud57.se/artister-2016/"))
 
@@ -7,12 +7,14 @@ bookings = []
 artists_doc.xpath("//div[@class='x-container wpb_row']/div/a/@href").each do |url|
   details_doc = Nokogiri::HTML(open(url))
 
-  name = details_doc.xpath("//div[@id='x-content-band-1']//h1/span").text.strip
+  name = details_doc.xpath("//div[@id='x-content-band-1']//h1/span").text.strip || nil
   spotify_id = nil
   playing_on = nil
 
-  booking = { name: name, spotify_id: spotify_id, playing_on: playing_on }
-  bookings << booking
+  if !except.include?(name.downcase) && (only.empty? || only.include?(name.downcase))
+    booking = { name: name, spotify_id: spotify_id, playing_on: playing_on }
+    bookings << booking
+  end
 end
 
 bookings
